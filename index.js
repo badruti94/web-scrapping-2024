@@ -1,5 +1,6 @@
+const chromium = require('chrome-aws-lambda');
 const express = require('express');
-const puppeteer = require('puppeteer');
+const puppeteer = require('puppeteer-core');
 const cors = require('cors');
 
 const app = express();
@@ -10,8 +11,13 @@ app.use(cors())
 app.get('/', async (req, res) => {
     try {
         console.log('run');
-        
-        const browser = await puppeteer.launch({ headless: true });
+
+        const browser = await puppeteer.launch({
+            // headless: true,
+            args: chromium.args,
+            executablePath: await chromium.executablePath,
+            headless: chromium.headless,
+        });
         const page = await browser.newPage();
 
         // Pergi ke halaman web target
@@ -29,7 +35,7 @@ app.get('/', async (req, res) => {
         res.json(links)
     } catch (error) {
         console.log('error', error);
-        
+
         res.json(error)
     }
 });
